@@ -1,4 +1,4 @@
-
+<!--checking the connection-->
 <?php
 
 require_once "db.php";
