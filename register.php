@@ -1,7 +1,7 @@
-
+<!-- registration form -->
 
 <?php
-
+// this code assumes that the Users table has the nine columns we created earlier
 require_once "db.php";
 
 $error = "";
@@ -108,7 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <h1>Create an Account</h1>
 
-
+<!-- you will now see an error or registration success message -->
 <?php if ($error != ""): ?>
     <p style="color: red;">
         <?php echo htmlspecialchars($error); ?>
