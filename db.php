@@ -4,7 +4,7 @@
 $host = "localhost";
 $username = "root";
 $password = "";
-$database = "library_db";
+$database = "library.db";
 
 $conn = new mysqli($host, $username, $password, $database);
 
