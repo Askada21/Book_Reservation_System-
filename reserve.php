@@ -112,6 +112,7 @@ try {
     <p><?php echo htmlspecialchars($message); ?></p>
 
     <a href="search.php">Back to Search</a>
+    <a href="my_reservations.php">My Reservations</a>
 
 </body>
 

@@ -98,11 +98,12 @@ $books = $stmt->get_result();
 
     <h1>Search Books</h1>
 
-    <nav>
-        <a href="index.php">Home</a>
-        <a href="search.php">Search Books</a>
-        <a href="logout.php">Logout</a>
-    </nav>
+        <nav>
+            <a href="index.php">Home</a>
+            <a href="search.php">Search Books</a>
+            <a href="my_reservations.php">My Reservations</a>
+            <a href="logout.php">Logout</a>
+        </nav>
 
     <hr>
 

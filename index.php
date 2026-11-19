@@ -30,6 +30,7 @@ $username = htmlspecialchars($_SESSION["username"]);
 <nav>
     <a href="index.php">Home</a>
     <a href="search.php">Search Books</a>
+    <a href="my_reservations.php">My Reservations</a>
     <a href="logout.php">Logout</a>
 </nav>
 
