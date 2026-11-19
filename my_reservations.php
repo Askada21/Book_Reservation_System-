@@ -79,6 +79,7 @@ $reservations = $stmt->get_result();
                 <th>Year</th>
                 <th>Category</th>
                 <th>Reservation Date</th>
+                <th>Action</th>
             </tr>
 
             <?php while ($book = $reservations->fetch_assoc()) { ?>
@@ -91,6 +92,26 @@ $reservations = $stmt->get_result();
                     <td><?php echo htmlspecialchars($book["Year"] ?? ""); ?></td>
                     <td><?php echo htmlspecialchars($book["CategoryDescription"]); ?></td>
                     <td><?php echo htmlspecialchars($book["ReservedDate"]); ?></td>
+
+                    <!-- Cancel reservation button -->
+
+                    <td>
+
+                        <form method="POST" action="cancel_reservation.php"
+                              onsubmit="return confirm('Are you sure you want to cancel this reservation?');">
+
+                            <input type="hidden" name="isbn"
+                                   value="<?php echo htmlspecialchars($book["ISBN"]); ?>">
+
+                            <input type="hidden" name="csrf_token"
+                                   value="<?php echo htmlspecialchars($_SESSION["csrf_token"]); ?>">
+
+                            <button type="submit">Cancel Reservation</button>
+
+                        </form>
+
+                    </td>
+
                 </tr>
 
             <?php } ?>
