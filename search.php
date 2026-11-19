@@ -1,7 +1,13 @@
+
 <?php
 
 require_once __DIR__ . "/auth.php";
 require_once __DIR__ . "/db.php";
+
+// Generate a security token
+if (!isset($_SESSION["csrf_token"])) {
+    $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
+}
 
 // Retrieve all categories from the database
 $sql = "select * from Categories order by CategoryDescription";
@@ -11,9 +17,9 @@ $categories = $conn->query($sql);
 $title = trim($_GET["title"] ?? "");
 $author = trim($_GET["author"] ?? "");
 $categoryID = $_GET["category"] ?? "";
+
 // Pagination settings
 $booksPerPage = 5;
-
 $page = max(1, (int) ($_GET["page"] ?? 1));
 
 // Count matching books
@@ -41,7 +47,9 @@ $countStmt->bind_param(
 $countStmt->execute();
 
 $totalBooks = $countStmt->get_result()
-    ->fetch_assoc()["TotalBooks"];
+                       ->fetch_assoc()["TotalBooks"];
+
+$countStmt->close();
 
 $totalPages = (int) ceil($totalBooks / $booksPerPage);
 
@@ -98,16 +106,18 @@ $books = $stmt->get_result();
 
     <hr>
 
+    <!-- Search form -->
+
     <form method="GET" action="search.php">
 
         <label>Book Title:</label>
         <input type="text" name="title"
-            value="<?php echo htmlspecialchars($title); ?>">
+               value="<?php echo htmlspecialchars($title); ?>">
         <br><br>
 
         <label>Author:</label>
         <input type="text" name="author"
-            value="<?php echo htmlspecialchars($author); ?>">
+               value="<?php echo htmlspecialchars($author); ?>">
         <br><br>
 
         <label>Category:</label>
@@ -140,6 +150,8 @@ $books = $stmt->get_result();
 
     <h2>Search Results</h2>
 
+    <p>Total books found: <?php echo $totalBooks; ?></p>
+
     <?php if ($books->num_rows > 0) { ?>
 
         <table border="1">
@@ -152,6 +164,7 @@ $books = $stmt->get_result();
                 <th>Year</th>
                 <th>Category</th>
                 <th>Status</th>
+                <th>Action</th>
             </tr>
 
             <?php while ($book = $books->fetch_assoc()) { ?>
@@ -160,9 +173,12 @@ $books = $stmt->get_result();
                     <td><?php echo htmlspecialchars($book["ISBN"]); ?></td>
                     <td><?php echo htmlspecialchars($book["BookTitle"]); ?></td>
                     <td><?php echo htmlspecialchars($book["Author"]); ?></td>
-                    <td><?php echo htmlspecialchars($book["Edition"]); ?></td>
-                    <td><?php echo htmlspecialchars($book["Year"]); ?></td>
+                    <td><?php echo htmlspecialchars($book["Edition"] ?? ""); ?></td>
+                    <td><?php echo htmlspecialchars($book["Year"] ?? ""); ?></td>
                     <td><?php echo htmlspecialchars($book["CategoryDescription"]); ?></td>
+
+                    <!-- Book status -->
+
                     <td>
                         <?php
                         if ($book["Reserved"] == "N") {
@@ -172,6 +188,33 @@ $books = $stmt->get_result();
                         }
                         ?>
                     </td>
+
+                    <!-- Reservation button -->
+
+                    <td>
+
+                        <?php if ($book["Reserved"] == "N") { ?>
+
+                            <form method="POST" action="reserve.php">
+
+                                <input type="hidden" name="isbn"
+                                       value="<?php echo htmlspecialchars($book["ISBN"]); ?>">
+
+                                <input type="hidden" name="csrf_token"
+                                       value="<?php echo htmlspecialchars($_SESSION["csrf_token"]); ?>">
+
+                                <button type="submit">Reserve</button>
+
+                            </form>
+
+                        <?php } else { ?>
+
+                            Unavailable
+
+                        <?php } ?>
+
+                    </td>
+
                 </tr>
 
             <?php } ?>
@@ -187,6 +230,8 @@ $books = $stmt->get_result();
     <!-- Pagination -->
 
     <?php if ($totalPages > 1) { ?>
+
+        <br>
 
         <div>
 
@@ -216,6 +261,11 @@ $books = $stmt->get_result();
             <?php } ?>
 
         </div>
+
+        <p>
+            Page <?php echo $page; ?>
+            of <?php echo $totalPages; ?>
+        </p>
 
     <?php } ?>
 
